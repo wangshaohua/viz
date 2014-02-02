@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+/*CSS Style goes here*/
+
+.block {
+	fill: #333;
+	stroke: #fff;
+}
+
+.block:hover {
+	fill: green;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+
+<h1>The cities' fingerprints</h1>
+
+<p>Plot the cities' blocks, the curve and the fingerprint.</p>
+<button class="btn btn-mini" id="button">Transition</button>
+
+<div id="map"></div>
+
+</body>
+
+
+
+
+
+<script>
+
+var width = 1100,
+    height = 900;
+
+var svg = d3.select("#map").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var button = d3.select("button");
+
+var projection = d3.geo.mercator()
+	.center([2.3488000,48.8534100])
+	.scale(260000)
+	.translate([width/2,height/2]);
+
+
+var path = d3.geo.path()
+    .projection(projection);
+
+
+// What happens when we click on the button
+button.on("click", function() {
+	console.log("click");
+  svg.selectAll("path")
+  	.transition().duration(10000)
+	  	.attr("transform", "translate(100,100) scale(1, 1)")
+	.transition().duration(2000)
+	  	.attr("transform", "translate(-100,-100) scale(1, 1)");
+});
+
+
+
+
+d3.json("data/cities/paris.json", function(error, city) {
+
+	// Plot the world map
+	svg.selectAll("path")
+		.data(city.features)
+			.enter().append("path")
+				.attr("class","block")
+				.attr("d", path);
+
+
+});
+
+</script>

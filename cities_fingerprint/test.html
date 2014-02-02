@@ -1,11 +1,79 @@
-<html>
-	<head>
-		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	</head>
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
 
-	<body>
+.land {
+	fill: #333;
+	stroke: #333;
+}
+
+.city {
+	fill: red;
+	stroke: #fff;
+}
+
+.city:hover {
+	fill: orange;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+
+<h1>The cities' fingerprints</h1>
+
+<p>Click on any of the cities to see their fingerprint. Black map on a white background. Moves away when we click on one of the cities, replaced by citie's fragments and plots.</p>
+
+<div id="map"></div>
+
+</body>
 
 
 
-	</body>
-</html>
+
+
+<script>
+
+var cities = {"cities":[{"name":"paris", "coordinates":[2.3488000,48.8534100]},
+						{"name":"london","coordinates":[-0.12750,51.50722]},
+						{"name":"moscow","coordinates":[37.6155600,55.7522200]},
+						{"name":"new-york","coordinates":[-74.0059700,40.7142700]},
+						{"name":"tokyo","coordinates":[139.5813000,35.6148800]}]};
+
+var width = 1100,
+    height = 900;
+
+var svg = d3.select("#map").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var projection = d3.geo.mercator()
+    .scale(200)
+    .translate([width/2,height/1.5]);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+d3.json("data/world_map/world.json", function(error, world) {
+
+	// Plot the world map
+	svg.selectAll("path")
+		.data(world.features)
+			.enter().append("path")
+				.attr("class","land")
+				.attr("d", path);
+
+	// Plot the cities
+	svg.selectAll("circle")
+		.data(cities.cities)
+			.enter().append("circle")
+				.attr("class","city")
+				.attr("cx", function(d) { return projection(d.coordinates)[0]; })
+				.attr("cy", function(d) { return projection(d.coordinates)[1]; })
+				.attr("r",5);
+
+
+});
+
+</script>

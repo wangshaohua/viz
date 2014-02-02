@@ -21,7 +21,8 @@
 <h1>The cities' fingerprints</h1>
 
 <p>Plot the cities' blocks, the curve and the fingerprint.</p>
-<button class="btn btn-mini" id="button">Transition</button>
+<button class="on" id="button">Transition</button>
+<button class="off" id ="butoff">Go back</button>
 
 <div id="map"></div>
 
@@ -33,6 +34,13 @@
 
 <script>
 
+var blocks = [];                        //Initialize empty array
+for (var i = 0; i < 100000; i++) {           //Loop 25 times
+    var newNumber1 = (Math.random()-0.5) * 100;  //New random number (0-30)
+    var newNumber2 = (Math.random()-0.5) * 100;  //New random number (0-30)
+    blocks.push([newNumber1,newNumber2]);             //Add new number to array
+}
+
 var width = 1100,
     height = 900;
 
@@ -40,7 +48,8 @@ var svg = d3.select("#map").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-var button = d3.select("button");
+var button = d3.select("#button"),
+    buttoff = d3.select("#butoff");
 
 var projection = d3.geo.mercator()
 	.center([2.3488000,48.8534100])
@@ -56,10 +65,17 @@ var path = d3.geo.path()
 button.on("click", function() {
 	console.log("click");
   svg.selectAll("path")
+  	.data(blocks)
   	.transition().duration(10000)
-	  	.attr("transform", "translate(100,100) scale(1, 1)")
-	.transition().duration(2000)
-	  	.attr("transform", "translate(-100,-100) scale(1, 1)");
+	  	.attr("transform", function(d) { return "translate(" + d[0] + "," + d[1] + ") scale(1, 1)"; });
+});
+
+buttoff.on("click", function() {
+	console.log("click");
+  svg.selectAll("path")
+  	.data(blocks)
+  	.transition().duration(10000)
+	  	.attr("transform", function(d) { return "translate(" + 0 + "," + 0 + ") scale(1, 1)"; });
 });
 
 

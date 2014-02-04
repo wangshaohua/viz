@@ -41,7 +41,7 @@ for (var i = 0; i < 100000; i++) {           //Loop 25 times
     blocks.push([newNumber1,newNumber2]);             //Add new number to array
 }
 
-var width = 1100,
+var width = 2200,
     height = 900;
 
 var svg = d3.select("#map").append("svg")
@@ -53,8 +53,8 @@ var button = d3.select("#button"),
 
 var projection = d3.geo.mercator()
 	.center([2.3488000,48.8534100])
-	.scale(260000)
-	.translate([width/2,height/2]);
+	.scale(340000)
+	.translate([width/2,height/1.7]);
 
 
 var path = d3.geo.path()
@@ -67,7 +67,8 @@ button.on("click", function() {
   svg.selectAll("path")
   	.data(blocks)
   	.transition().duration(10000)
-	  	.attr("transform", function(d) { return "translate(" + d[0] + "," + d[1] + ") scale(1, 1)"; });
+	  	.attr("transform", function(d) { return "translate(" + d[0] + "," + d[1] + ") scale(1, 1)"; })
+	  	.attr("d",d3.geo.path());
 });
 
 buttoff.on("click", function() {

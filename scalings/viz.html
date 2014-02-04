@@ -5,91 +5,120 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
 <style type="text/css">
 			
-			.axis path,
-			.axis line {
-				fill: none;
-				stroke: black;
-				shape-rendering: crispEdges;
-			}
+			.axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
 			
 			.axis text {
 				font-family: sans-serif;
-				font-size: 11px;
+				font-size: 10px;
 			}
-      /*.datapoints {
-        stroke: #fff;
-        stroke-width: 1.5px;
-        }
-*/
+      
+      .label {
+        fill: #777;
+      }
+
+      .city.label {
+      font: 500 78px "Helvetica Neue";
+      fill: #ddd;
+}
+
+
 		</style>
   </head>
   <body>
     <div id="chart"></div>
     <script type="text/javascript">
 
-      var w = 800, h = 500, padding=50;      
+      var w = 1200, h = 800, padding=50;      
       var colors = d3.scale.category20();
 
-      var vis = d3.select("#chart").append("svg:svg")
+      var vis = d3.select("#chart")
+          .append("svg:svg")
           .attr("width", w)
           .attr("height", h);
 
-      
-    d3.json("usa_co2_data.json", function(co2) {
+      // Various scales. These domains make assumptions of data, naturally.
+      var xScale = d3.scale.log().domain([100000,18852000]).range([padding,w-padding]),
+          yScale = d3.scale.log().domain([1000,2322391]).range([h-padding,padding]);
 
-        var DisplayName = function() {
-          var circle = d3.select(this);
-          circle.style("fill", "red" );
-      }
+      //Various axis
+      var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(3),
+          yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(3);
 
 
-      	var xScale = d3.scale.log()
-      			.domain([100000,18852000])
-      			.range([padding,w-padding]);
+  // Append the x axis to visualisation
+  vis.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + (h - padding) + ")")
+    .call(xAxis);
 
-      	var yScale = d3.scale.log()
-      			.domain([1000,2322391])
-      			.range([h-padding,padding]);
+  // Add an x-axis label.
+  vis.append("text")
+      .attr("class", "x label")
+      .attr("text-anchor", "end")
+      .attr("x", w)
+      .attr("y", h -1.2*padding)
+      .text("Population");
 
-      	var xAxis = d3.svg.axis()
-            .scale(xScale)
-            .orient("bottom")
-      			.ticks(3);
 
-      	var yAxis = d3.svg.axis()
-            .scale(yScale)
-            .orient("left")
-			      .ticks(3);
+  vis.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(" + padding + ",0)")
+      .call(yAxis)
+
+  // Add a y-axis label.
+  vis.append("text")
+      .attr("class", "y label")
+      .attr("text-anchor", "end")
+      .attr("y", 1.2*padding)
+      .attr("x", -padding)
+      .attr("dy", ".75em")
+      .attr("transform", "rotate(-90)")
+      .text("co2 (tons per years)");
+
+
+  // Add the city name label; the value is set on transition.
+  var label = vis.append("text")
+      .attr("class", "city label")
+      .attr("text-anchor", "end")
+      .attr("y", h - 2*padding)
+      .attr("x", w);
+
+  d3.json("usa_co2_data.json", function(co2) {
+
+        var mouseon = function(circle,d) {
+          circle.attr("r", 21 );
+          circle.attr("fill",colors(d.id))
+          label.text(d.name)
+              .transition()
+              .style("opacity", 1);
+        }
+
+        var mouseout = function(circle) {
+          circle.attr("r",7);
+          label.text("")
+               .transition(3000)
+               .style("opacity",0);
+        }
+
 
       vis.selectAll("circle")
          .data(co2)
          .attr("class","circle")
          .enter().append("svg:circle")
          // .attr("stroke", "black")
-      	 .attr("fill", function(d) { return colors(d.id); })
+         .attr("fill", "#333")
          .attr("cx", function(d) { return xScale(d.pop); })
          .attr("cy", function(d) { return yScale(d.co2); })
          .attr("r", 7)
-          .on("mouseover", DisplayName)
-          .on("mouseout",function(d) { d3.select(this).style("fill",colors(d.id)); })
+         .on("mouseover", function(d) { mouseon(d3.select(this),d) } )
+         .on("mouseout",function(d) { mouseout(d3.select(this)) })
          .append("svg:title")
-      	 .text(function(d) {return d.name});
+         .text(function(d) {return d.name});
 
-
-
-
-	vis.append("g")
-		.attr("class", "axis")
-		.attr("transform", "translate(0," + (h - padding) + ")")
-    		.call(xAxis);
-
-vis.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(" + padding + ",0)")
-    .call(yAxis)
-    .append("text")
-    .attr("transform", "translate(0," + 0.9*padding + ")")
-    .text("CO2");
 
 });
 

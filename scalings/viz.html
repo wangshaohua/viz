@@ -21,8 +21,8 @@
       }
 
       .city.label {
-      font: 500 78px "Helvetica Neue";
-      fill: #ddd;
+      font: 500 30px "Helvetica Neue";
+      fill: #fff;
 
       #container {
         overflow: hidden;
@@ -112,18 +112,12 @@
       .attr("transform", "rotate(-90)")
       .text("co2 (tons per years)");
 
-
-  // Add the city name label; the value is set on transition.
-  var label = vis.append("text")
-      .attr("class", "city label")
-      .attr("text-anchor", "end")
-      .attr("y", h - 2*padding)
-      .attr("x", w - padding);
-
-
   var map = d3.select("#map").append("svg")
     .attr("width", w)
     .attr("height", h);
+
+
+
 
   //Map projection    
   var projection = d3.geo.mercator()
@@ -142,11 +136,8 @@
         .enter().append("path")
           .attr("class","land")
           .attr("d", path);
-  });
-   
 
-
-  // Plot the graph
+        // Plot the graph
   d3.json("usa_co2_data.json", function(co2) {
 
         var mouseon = function(circle,d) {
@@ -181,6 +172,19 @@
 
 
 });
+
+// Add the city name label; the value is set on transition.
+  var label = map.append("text")
+      .attr("class", "city label")
+      .attr("text-anchor", "top")
+      .attr("y", 1.2*padding)
+      .attr("x", 0.7*padding);
+  });
+   
+
+  
+ 
+
 
     </script>
 

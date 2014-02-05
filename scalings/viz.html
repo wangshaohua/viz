@@ -23,16 +23,49 @@
       .city.label {
       font: 500 78px "Helvetica Neue";
       fill: #ddd;
+
+      #container {
+        overflow: hidden;
+        width:1300px;
+      }
+
+      .data {
+      }
+
+      #map {
+        float:left;
+        display:inline-block;
+
+        width:400px;
+      }
+      #chart {
+        float:left;
+                display:inline-block;
+
+        width:400px;
+      }
+}
+
+.land {
+  fill: #333;
+  stroke: #333;
 }
 
 
 		</style>
   </head>
   <body>
-    <div id="chart"></div>
+
+    <div id="container">
+      <div id="map" class="data"></div>
+      <div id="chart" class="data"></div>
+    </div>
+
+
+
     <script type="text/javascript">
 
-      var w = 1200, h = 800, padding=50;      
+      var w = 600, h = 400, padding=50;      
       var colors = d3.scale.category20();
 
       var vis = d3.select("#chart")
@@ -87,6 +120,33 @@
       .attr("y", h - 2*padding)
       .attr("x", w - padding);
 
+
+  var map = d3.select("#map").append("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+  //Map projection    
+  var projection = d3.geo.mercator()
+  .scale(4000)
+  .translate([2.3*w,1.63*h]);
+
+  var path = d3.geo.path()
+  .projection(projection);
+
+  //Plot the usa map
+  d3.json("data/map/map.json", function(world) {
+
+    // Plot the world map
+    map.selectAll("path")
+      .data(world.features)
+        .enter().append("path")
+          .attr("class","land")
+          .attr("d", path);
+  });
+   
+
+
+  // Plot the graph
   d3.json("usa_co2_data.json", function(co2) {
 
         var mouseon = function(circle,d) {

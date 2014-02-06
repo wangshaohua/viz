@@ -14,7 +14,7 @@ function parseData(d) {
   return _.map(d, function(d) {
     var o = {};
     _.each(keys, function(k) {
-      if( k == 'NAME' )
+      if( k == 'Name' )
         o[k] = d[k];
       else if( k == 'ID')
          o[k] = parseInt(d[k]);
@@ -50,140 +50,52 @@ function getBounds(d, paddingFactor) {
 
 
 
-
-
-
-
-
-
-var w = 600, h = 400, padding=50;      
-var colors = d3.scale.category20();
-
-var vis = d3.select("#chart")
-.append("svg:svg")
-.attr("width", w)
-.attr("height", h);
-
-// Various scales. These domains make assumptions of data, naturally.
-var xScale = d3.scale.log().domain([100000,18852000]).range([padding,w-padding]),
-yScale = d3.scale.log().domain([1000,2322391]).range([h-padding,padding]);
-
-//Various axis
-var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(3),
-yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(3);
-
-
-// Append the x axis to visualisation
-vis.append("g")
-.attr("class", "axis")
-.attr("transform", "translate(0," + (h - padding) + ")")
-.call(xAxis);
-
-// Add an x-axis label.
-vis.append("text")
-.attr("class", "x label")
-.attr("text-anchor", "end")
-.attr("x", w-padding)
-.attr("y", h -1.2*padding)
-.text("Population");
-
-
-vis.append("g")
-.attr("class", "axis")
-.attr("transform", "translate(" + padding + ",0)")
-.call(yAxis)
-
-// Add a y-axis label.
-vis.append("text")
-.attr("class", "y label")
-.attr("text-anchor", "end")
-.attr("y", 1.2*padding)
-.attr("x", -padding)
-.attr("dy", ".75em")
-.attr("transform", "rotate(-90)")
-.text("co2 (tons per years)");
-
+// Add a map
 var map = d3.select("#map").append("svg")
-.attr("width", w)
-.attr("height", h);
-
-
-
+   .attr("width", 800)
+   .attr("height", 600);
 
 //Map projection    
 var projection = d3.geo.mercator()
-.scale(4000)
-.translate([2.3*w,1.63*h]);
+   .scale(4000)
+   .translate([1.8*800,1.3*600]);
 
 var path = d3.geo.path()
-.projection(projection);
+   .projection(projection);
+
+
+
 
 //Plot the usa map
 d3.json("data/map/map.json", function(world) {
 
-// Plot the world map
-map.selectAll("path")
-.data(world.features)
-.enter().append("path")
-.attr("class","land")
-.attr("d", path);
+   // Plot the world map
+   map.selectAll("path")
+      .data(world.features)
+      .enter().append("path")
+         .attr("class","land")
+         .attr("d", path);
 
-// Plot the graph
-d3.json("usa_co2_data.json", function(co2) {
+   // Add the city name label; the value is set on transition.
+   var label = map.append("text")
+      .attr("class", "city label")
+      .attr("text-anchor", "middle")
+      .attr("y", 100)
+      .attr("x", 100);
 
-var mouseon = function(circle,d) {
-circle.attr("r", 21 );
-circle.attr("fill",colors(d.id))
-label.text(d.name)
-.transition()
-.style("opacity", 1);
-}
-
-var mouseout = function(circle) {
-circle.attr("r",7);
-label.text("")
- .transition(3000)
- .style("opacity",0);
-}
-
-
-vis.selectAll("circle")
-.data(co2)
-.attr("class","circle")
-.enter().append("svg:circle")
-// .attr("stroke", "black")
-.attr("fill", "#333")
-.attr("cx", function(d) { return xScale(d.pop); })
-.attr("cy", function(d) { return yScale(d.co2); })
-.attr("r", 7)
-.on("mouseover", function(d) { mouseon(d3.select(this),d) } )
-.on("mouseout",function(d) { mouseout(d3.select(this)) })
-.append("svg:title")
-.text(function(d) {return d.name});
-
-
-});
-
-// Add the city name label; the value is set on transition.
-var label = map.append("text")
-.attr("class", "city label")
-.attr("text-anchor", "top")
-.attr("y", 1.2*padding)
-.attr("x", 0.7*padding);
-});
 
 
 
 d3.csv("data/data.csv", function(data) {
 
    var xAxis = "Population",
-       yAxis = "Area";
-   var yAxisOptions = ["Area", "Distance travelled", "Total Road length"]
+       yAxis = "Road length";
+   var yAxisOptions = ["Area", "Distance travelled", "Road length"]
    // var xAxisOptions = ["Population"];
    var descriptions = {
       "Area" : "Surface area (square km)",
       "Distance travelled" : "Total daily distance travelled (km)",
-      "Road Length" : "Total length of roads (km)"};
+      "Road length" : "Total length of roads (km)"};
 
 
    var keys = _.keys(data[0]);
@@ -264,8 +176,9 @@ d3.csv("data/data.csv", function(data) {
          .attr('fill', function(d, i) {return pointColour(i);})
          .style('cursor', 'pointer')
          .on('mouseover', function(d) {
-            d3.select('svg g.chart #countryLabel')
-               .text(d.Country)
+            console.log(d.Name)
+            d3.select()
+               .text(d.Name)
                .transition()
                   .style('opacity', 1);
             })
@@ -310,17 +223,17 @@ d3.csv("data/data.csv", function(data) {
                return isNaN(d[yAxis]) ? d3.select(this).attr('cy') : yScale(d[yAxis]);
                })
             .attr('r', function(d) {
-               return isNaN(d[xAxis]) || isNaN(d[yAxis]) ? 0 : 12;
+               return isNaN(d[xAxis]) || isNaN(d[yAxis]) ? 0 : 7;
                });
 
       // Also update the axes
       d3.select('#xAxis')
-      .transition()
-      .call(makeXAxis);
+         .transition()
+         .call(makeXAxis);
 
       d3.select('#yAxis')
-      .transition()
-      .call(makeYAxis);
+         .transition()
+         .call(makeYAxis);
 
       // Update axis labels
       d3.select('#yLabel')
@@ -373,4 +286,5 @@ d3.csv("data/data.csv", function(data) {
    };
 
 
+});
 });

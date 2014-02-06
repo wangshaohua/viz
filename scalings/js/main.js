@@ -89,7 +89,7 @@ d3.json("data/map/map.json", function(world) {
 d3.csv("data/data.csv", function(data) {
 
    var xAxis = "Population",
-       yAxis = "Road length";
+       yAxis = "Distance travelled";
    var yAxisOptions = ["Area", "Distance travelled", "Road length"]
    // var xAxisOptions = ["Population"];
    var descriptions = {
@@ -123,10 +123,10 @@ d3.csv("data/data.csv", function(data) {
       .enter().append('li')
          .text(function(d) {return d;})
          .classed('selected', function(d) { //Clever, use a selected class for css styling purposes
-            return d === xAxis;
+            return d === yAxis;
          })
       .on('click', function(d) {
-         xAxis = d;
+         yAxis = d;
          updateChart();
          updateMenus();
          updateMap();

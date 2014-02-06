@@ -4,7 +4,26 @@
     <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
 <style type="text/css">
-			
+			path {
+   fill: #CED8B6;
+}
+
+line {
+   stroke: #555;
+   stroke-width: 2px;
+}
+
+line#bestfit {
+   stroke: #ddd;
+   stroke-width: 10px;
+}
+
+#xAxis path, #yAxis path, #xAxis line, #yAxis line {
+   stroke: #ccc;
+   fill: none;
+   shape-rendering: crispEdges;
+}
+
 			.axis path, .axis line {
         fill: none;
         stroke: #000;
@@ -26,7 +45,6 @@
 
       #container {
         overflow: hidden;
-        width:1300px;
       }
 
       .data {
@@ -35,14 +53,10 @@
       #map {
         float:left;
         display:inline-block;
-
-        width:400px;
       }
       #chart {
         float:left;
-                display:inline-block;
-
-        width:400px;
+        display:inline-block;
       }
 }
 
@@ -58,134 +72,16 @@
 
     <div id="container">
       <div id="map" class="data"></div>
-      <div id="chart" class="data"></div>
+      <div id="chart1" class="data"></div>
+    </div>
+
+    <div id="menu">
+       <ul id="y-axis-menu"></ul>
     </div>
 
 
+    <script src="js/underscore-min.js"></script>
+    <script src="js/main.js"></script>
 
-    <script type="text/javascript">
-
-      var w = 600, h = 400, padding=50;      
-      var colors = d3.scale.category20();
-
-      var vis = d3.select("#chart")
-          .append("svg:svg")
-          .attr("width", w)
-          .attr("height", h);
-
-      // Various scales. These domains make assumptions of data, naturally.
-      var xScale = d3.scale.log().domain([100000,18852000]).range([padding,w-padding]),
-          yScale = d3.scale.log().domain([1000,2322391]).range([h-padding,padding]);
-
-      //Various axis
-      var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(3),
-          yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(3);
-
-
-  // Append the x axis to visualisation
-  vis.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(0," + (h - padding) + ")")
-    .call(xAxis);
-
-  // Add an x-axis label.
-  vis.append("text")
-      .attr("class", "x label")
-      .attr("text-anchor", "end")
-      .attr("x", w-padding)
-      .attr("y", h -1.2*padding)
-      .text("Population");
-
-
-  vis.append("g")
-      .attr("class", "axis")
-      .attr("transform", "translate(" + padding + ",0)")
-      .call(yAxis)
-
-  // Add a y-axis label.
-  vis.append("text")
-      .attr("class", "y label")
-      .attr("text-anchor", "end")
-      .attr("y", 1.2*padding)
-      .attr("x", -padding)
-      .attr("dy", ".75em")
-      .attr("transform", "rotate(-90)")
-      .text("co2 (tons per years)");
-
-  var map = d3.select("#map").append("svg")
-    .attr("width", w)
-    .attr("height", h);
-
-
-
-
-  //Map projection    
-  var projection = d3.geo.mercator()
-  .scale(4000)
-  .translate([2.3*w,1.63*h]);
-
-  var path = d3.geo.path()
-  .projection(projection);
-
-  //Plot the usa map
-  d3.json("data/map/map.json", function(world) {
-
-    // Plot the world map
-    map.selectAll("path")
-      .data(world.features)
-        .enter().append("path")
-          .attr("class","land")
-          .attr("d", path);
-
-        // Plot the graph
-  d3.json("usa_co2_data.json", function(co2) {
-
-        var mouseon = function(circle,d) {
-          circle.attr("r", 21 );
-          circle.attr("fill",colors(d.id))
-          label.text(d.name)
-              .transition()
-              .style("opacity", 1);
-        }
-
-        var mouseout = function(circle) {
-          circle.attr("r",7);
-          label.text("")
-               .transition(3000)
-               .style("opacity",0);
-        }
-
-
-      vis.selectAll("circle")
-         .data(co2)
-         .attr("class","circle")
-         .enter().append("svg:circle")
-         // .attr("stroke", "black")
-         .attr("fill", "#333")
-         .attr("cx", function(d) { return xScale(d.pop); })
-         .attr("cy", function(d) { return yScale(d.co2); })
-         .attr("r", 7)
-         .on("mouseover", function(d) { mouseon(d3.select(this),d) } )
-         .on("mouseout",function(d) { mouseout(d3.select(this)) })
-         .append("svg:title")
-         .text(function(d) {return d.name});
-
-
-});
-
-// Add the city name label; the value is set on transition.
-  var label = map.append("text")
-      .attr("class", "city label")
-      .attr("text-anchor", "top")
-      .attr("y", 1.2*padding)
-      .attr("x", 0.7*padding);
-  });
-   
-
-  
- 
-
-
-    </script>
 
   </body>

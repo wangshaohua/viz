@@ -39,15 +39,20 @@ line#bestfit {
         fill: #333;
       }
 
-      .city.label {
-      font: 500 150px "Helvetica Neue";
+      ,mapcity {
+        fill: #333;
+      }
+
+      .map-city.selected {
+        fill: red;
+      }
+      #city {
+      font: 500 70px "Helvetica Neue";
       fill: #000;
+    }
 
       #container {
         overflow: hidden;
-      }
-
-      .data {
       }
 
       #map {
@@ -58,7 +63,7 @@ line#bestfit {
         float:left;
         display:inline-block;
       }
-}
+
 
 .land {
   fill: #333;
@@ -71,6 +76,7 @@ line#bestfit {
   <body>
 
     <div id="container">
+      <div id="city" class="text"></div>
       <div id="map" class="data"></div>
       <div id="chart1" class="data"></div>
     </div>

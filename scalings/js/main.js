@@ -64,8 +64,14 @@ var path = d3.geo.path()
    .projection(projection);
 
 
-
-
+// Add the city name label; the value is set on transition.
+var label = d3.select("#city").append("svg")
+  .attr("width", 1600)
+  .attr("height", 150)
+  .append("text")
+      .attr({'x': 10, 'y': 90, 'text-anchor': 'begin'})
+      .text("nothing");
+    
 //Plot the usa map
 d3.json("data/map/map.json", function(world) {
 
@@ -75,14 +81,6 @@ d3.json("data/map/map.json", function(world) {
       .enter().append("path")
          .attr("class","land")
          .attr("d", path);
-
-   // Add the city name label; the value is set on transition.
-   var label = map.append("text")
-      .attr("class", "city label")
-      .attr("text-anchor", "middle")
-      .attr("y", 100)
-      .attr("x", 100);
-
 
 
 
@@ -175,19 +173,8 @@ d3.csv("data/data.csv", function(data) {
             })
          .attr('fill', function(d, i) {return pointColour(i);})
          .style('cursor', 'pointer')
-         .on('mouseover', function(d) {
-            console.log(d.Name)
-            d3.select()
-               .text(d.Name)
-               .transition()
-                  .style('opacity', 1);
-            })
-         .on('mouseout', function(d) {
-            d3.select('svg g.chart #countryLabel')
-               .transition()
-                  .duration(1500)
-                  .style('opacity', 0);
-    });
+         .on('mouseover', function(d) { mouseoverChart(d); })
+         .on('mouseout', function(d) { mouseoutChart(d);   });
 
 
    updateChart(true);
@@ -283,8 +270,40 @@ d3.csv("data/data.csv", function(data) {
 
    function updateMap() {
 
+   }
+
+
+   // MouseOvers and Mousouts
+  function mouseoverChart(d) {
+    // Show city name
+    label.text(d.Name)
+      .transition()
+      .style('opacity', 1);
+
+    // Show city on map
+    map.append("circle")
+      .attr("class","map-city")
+      .classed('selected',true)
+      .attr("cx",projection([d.Lon,d.Lat])[0])
+      .attr("cy",projection([d.Lon,d.Lat])[1])
+      .attr("r",5);
+
+
    };
 
+
+  function mouseoutChart(d) {
+
+    // Make label disappear
+    label.transition()
+      .duration(1500)
+      .style('opacity', 0);
+   }
+
+   //Make point disappear
+   d3.select(".map-city")
+    .classed('selected',false);
+   
 
 });
 });

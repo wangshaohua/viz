@@ -27,22 +27,26 @@ function parseData(d) {
 
 
 function getBounds(d, paddingFactor) {
-  // Find min and maxes of each data item (for the scales)
+  // Find min and maxes of each data item (for the scales).
+  // Has to be two-dimensional because we don't have the same population range for all the data sets
   paddingFactor = typeof paddingFactor !== 'undefined' ? paddingFactor : 1;
 
-  var keys = _.keys(d[0]), b = {};
-  _.each(keys, function(k) {
-    b[k] = {};
-    _.each(d, function(d) {
-      if(isNaN(d[k]))
-        return;
-      if(b[k].min === undefined || d[k] < b[k].min)
-        b[k].min = d[k];
-      if(b[k].max === undefined || d[k] > b[k].max)
-        b[k].max = d[k];
-    });
-    b[k].max > 0 ? b[k].max *= paddingFactor : b[k].max /= paddingFactor;
-    b[k].min > 0 ? b[k].min /= paddingFactor : b[k].min *= paddingFactor;
+   var keys = _.keys(d[0]), b = {};
+   _.each(keys, function(k) {
+      b[k] = {};
+      _.each(keys,function(j) {
+         b[k][j] = {};
+         _.each(d, function(d) {
+            if(isNaN(d[k]) || isNaN(d[j]))
+               return;
+            if(b[k][j].min === undefined || d[k] < b[k][j].min)
+               b[k][j].min = d[k];
+            if(b[k][j].max === undefined || d[k] > b[k][j].max)
+               b[k][j].max = d[k];
+            });
+         b[k][j].max > 0 ? b[k][j].max *= paddingFactor : b[k][j].max /= paddingFactor;
+         b[k][j].min > 0 ? b[k][j].min /= paddingFactor : b[k][j].min *= paddingFactor;
+     });
   });
   return b;
 }
@@ -99,6 +103,8 @@ d3.csv("data/data.csv", function(data) {
    var keys = _.keys(data[0]);
    var data = parseData(data);
    var bounds = getBounds(data, 1);
+
+   console.log(bounds)
 
    var w = 1000, h = 640;      
    var colors = d3.scale.category20();
@@ -231,11 +237,11 @@ d3.csv("data/data.csv", function(data) {
 
    function updateScales() {
       xScale = d3.scale.log()
-         .domain([bounds[xAxis].min, bounds[xAxis].max])
+         .domain([bounds[xAxis][yAxis].min, bounds[xAxis][yAxis].max])
          .range([20, 780]);
 
       yScale = d3.scale.log()
-         .domain([bounds[yAxis].min, bounds[yAxis].max])
+         .domain([bounds[yAxis][xAxis].min, bounds[yAxis][xAxis].max])
          .range([600, 100]);    
    }
 
@@ -244,12 +250,14 @@ d3.csv("data/data.csv", function(data) {
    function makeXAxis(s) {
       s.call(d3.svg.axis()
          .scale(xScale)
+         .ticks(3)
          .orient("bottom"));
    }
 
    function makeYAxis(s) {
       s.call(d3.svg.axis()
          .scale(yScale)
+         .ticks(3)
          .orient("left"));
    }
 

@@ -177,9 +177,9 @@ d3.csv("data/data.csv", function(data) {
          .attr('cy', function(d) {
             return isNaN(d[yAxis]) ? d3.select(this).attr('cy') : yScale(d[yAxis]);
             })
-         .attr('fill', function(d, i) {return pointColour(i);})
+         .attr('fill', function(d, i) {return '#333'/*pointColour(i);*/})
          .style('cursor', 'pointer')
-         .on('mouseover', function(d) { mouseoverChart(d); })
+         .on('mouseover', function(d) { mouseoverChart(d,d3.select(this)); })
          .on('mouseout', function(d) { mouseoutChart(d);   });
 
 
@@ -282,36 +282,56 @@ d3.csv("data/data.csv", function(data) {
 
 
    // MouseOvers and Mousouts
-  function mouseoverChart(d) {
+  function mouseoverChart(d,circle) {
     // Show city name
     label.text(d.Name)
       .transition()
       .style('opacity', 1);
 
+
+   //Bigger circle
+   circle.classed("mouseover",true)
+      .attr('fill',"red")
+      .transition()
+         .duration(100)
+         .attr("r",12);
+
     // Show city on map
-    map.append("circle")
-      .attr("class","map-city")
-      .classed('selected',true)
+    map.append("circle")      
+      .classed("map-city",true)
       .attr("cx",projection([d.Lon,d.Lat])[0])
       .attr("cy",projection([d.Lon,d.Lat])[1])
-      .attr("r",5);
+      .attr("r",8)
+      .transition()
+         .style('opacity',1);
 
 
    };
 
 
-  function mouseoutChart(d) {
+  function mouseoutChart(d,circle) {
 
     // Make label disappear
     label.transition()
       .duration(1500)
       .style('opacity', 0);
-   }
+
+
+   // Make the circle small again
+   d3.select("svg g.chart circle.mouseover")
+      .classed("mouseover",false)
+      .transition()
+         .duration(1000)
+         .attr("r",7)
+         .attr('fill',"#333")
+         ;
 
    //Make point disappear
-   d3.select(".map-city")
-    .classed('selected',false);
+   d3.select("circle.map-city")
+      .classed("map-city",false)
+      .attr("r",2);
    
+   }
 
 });
 });

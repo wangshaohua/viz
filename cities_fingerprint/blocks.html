@@ -68,7 +68,6 @@ button.on("click", function() {
   	.data(blocks)
   	.transition().duration(10000)
 	  	.attr("transform", function(d) { return "translate(" + d[0] + "," + d[1] + ") scale(1, 1)"; })
-	  	.attr("d",d3.geo.path());
 });
 
 

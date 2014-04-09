@@ -88,23 +88,25 @@ d3.json("data/map/map.json", function(world) {
 
 
 
-d3.csv("data/data.csv", function(data) {
+d3.csv("data/data1.csv", function(data) {
 
    var xAxis = "Population",
        yAxis = "Distance travelled";
-   var yAxisOptions = ["Area", "Distance travelled", "Road length"]
+   var yAxisOptions = ["Area", "Distance travelled", "Road length","CO2","Delay"]
    // var xAxisOptions = ["Population"];
    var descriptions = {
       "Area" : "Surface area (square km)",
       "Distance travelled" : "Total daily distance travelled (km)",
-      "Road length" : "Total length of roads (km)"};
+      "Road length" : "Total length of roads (km)",
+      "CO2" : "CO2 emitted per year (tons)",
+      "Delay" : "Delay due to congestion per year (hours)"};
 
 
    var keys = _.keys(data[0]);
    var data = parseData(data);
    var bounds = getBounds(data, 1);
 
-   console.log(bounds)
+   console.log(data)
 
    var w = 1000, h = 640;      
    var colors = d3.scale.category20();
